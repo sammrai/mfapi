@@ -1,5 +1,4 @@
-import { ApiResponseHandler } from './api'
-
+import { ApiResponseHandler } from "./api";
 
 export enum AccountCategory {
   Bank = 2,            //銀行
@@ -20,36 +19,36 @@ export default AccountCategory;
 export class Account extends ApiResponseHandler {
   public async addManualAccount(category: AccountCategory, name: string) {
     const postData = {
-      'new_manual_account[category_id]': category,
-      'new_manual_account[name]': name,
+      "new_manual_account[category_id]": category,
+      "new_manual_account[name]": name,
     };
 
-    return this.handleRequest('/accounts/manual_account', postData);
+    return this.handleRequest("/accounts/manual_account", postData);
   }
-  
+
   public async getManualAccounts() {
-    return this.fetchData('/accounts', $ => {
-      const results: { name: string, id: string }[] = [];
-      const cssSelector = 'section.manual_accounts tr td:first-child a';
+    return this.fetchData("/accounts", ($) => {
+      const results: { name: string; id: string }[] = [];
+      const cssSelector = "section.manual_accounts tr td:first-child a";
 
       $(cssSelector).each((_, el) => {
         const elem = el;
         const name = $(elem).text().trim();
-        const href = $(elem).attr('href') || '';
-        const id = href.split('/').pop() || '';
+        const href = $(elem).attr("href") || "";
+        const id = href.split("/").pop() || "";
         results.push({ name, id });
       });
 
       return results;
     });
   }
-  
+
   public async deleteAccount(accountIdHash: string) {
     const postData = {
-      '_method': 'delete',
-      'account_id_hash': accountIdHash,
+      _method: "delete",
+      account_id_hash: accountIdHash,
     };
 
-    return this.handleRequest('/accounts', postData);
+    return this.handleRequest("/accounts", postData);
   }
 }

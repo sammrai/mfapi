@@ -23,7 +23,7 @@ RUN echo network-timeout 600000 > .yarnrc && \
   yarn cache clean
 
 COPY src/ src/
-COPY tsconfig.json .
+COPY tsconfig.json .eslintignore .eslintrc.yml .
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
