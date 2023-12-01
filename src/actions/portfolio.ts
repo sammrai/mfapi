@@ -93,6 +93,15 @@ export enum AssetSubclass {
   OtherAssets = 43, // その他
 }
 
+export interface PortfolioModel {
+  portfolioId: string;
+  sub_account_id_hash: string;
+  temp_asset_subclass_id: string;
+  asset_subclass_id: string;
+  name: string;
+  value: number;
+}
+
 export class Portfolio extends ApiResponseHandler {
   private formatDate(date: Date): string {
     const year = date.getFullYear();
@@ -102,7 +111,7 @@ export class Portfolio extends ApiResponseHandler {
     return `${year}/${month}/${day}`;
   }
 
-  public async addPortfolioEntry(
+  public async addPortfolio(
     manualAccount: ManualAccount,
     assetSubclassId: AssetSubclass,
     assetName: string,
@@ -127,36 +136,61 @@ export class Portfolio extends ApiResponseHandler {
 
   public async getPortfolios(
     accountId: ManualAccount
-  ): Promise<{ [key: string]: string }[]> {
+  ): Promise<PortfolioModel[]> {
     const url = `/accounts/show_manual/${accountId.id}`;
 
     return this.fetchData(url, ($) => {
-      const assetDetails: { [key: string]: string }[] = [];
+      const assetDetails: PortfolioModel[] = [];
 
       $('form.form-horizontal[action="/bs/portfolio/edit"]').each((_, form) => {
-        let formId = $(form).attr("id");
+        const formId = $(form).attr("id")?.replace("new_user_asset_det_", "");
         const formInputs = $(form).find(".control-group input[id]");
-        const detail: { [key: string]: string } = {};
+        const detail: Partial<PortfolioModel> = {};
 
         if (formId) {
-          formId = formId.replace("new_user_asset_det_", "");
-          detail.formId = formId;
+          detail.portfolioId = formId;
         }
 
         formInputs.each((_, input) => {
           const id = $(input).attr("id");
           const value = $(input).val() as string;
+
           if (id && value) {
-            detail[id] = value;
+            switch (id.replace("user_asset_det_", "")) {
+              case "sub_account_id_hash":
+                detail.sub_account_id_hash = value;
+                break;
+              case "temp_asset_subclass_id":
+                detail.temp_asset_subclass_id = value;
+                break;
+              case "asset_subclass_id":
+                detail.asset_subclass_id = value;
+                break;
+              case "name":
+                detail.name = value;
+                break;
+              case "value":
+                detail.value = parseInt(value, 10); // 数値に変換
+                break;
+            }
           }
         });
 
         if (Object.keys(detail).length > 0) {
-          assetDetails.push(detail);
+          assetDetails.push(detail as PortfolioModel);
         }
       });
 
       return assetDetails;
     });
+  }
+
+  public async deletePortfolio(portfolio: PortfolioModel): Promise<void> {
+    const url = `/bs/portfolio/${portfolio.portfolioId}?sub_account_id_hash=${portfolio.sub_account_id_hash}`;
+    const postData = {
+      _method: "delete",
+    };
+    console.log(url);
+    return this.handleRequest(url, postData);
   }
 }

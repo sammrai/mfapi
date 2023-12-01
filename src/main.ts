@@ -23,11 +23,12 @@ async function main() {
   const a = await account.getManualAccounts();
   console.log(a);
 
-  // 資産追加・一覧
+  // 資産追加・一覧・削除
   const portfolio = new Portfolio(session);
-  // await portfolio.addPortfolioEntry(a[0], AssetSubclass.Cash, `Cash${AssetSubclass.Cash}`, 100)
+  // await portfolio.addPortfolio(a[0], AssetSubclass.Cash, `Cash${AssetSubclass.Cash}`, 100)
   const b = await portfolio.getPortfolios(a[0]);
-  console.log(b);
+  console.log(b.length);
+  await portfolio.deletePortfolio(b[0]);
 }
 
 (async () => {
