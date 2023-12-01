@@ -7,8 +7,8 @@ export enum AssetSubclass {
   ElectronicMoney = 50, // 電子マネー
   OrdinaryDeposit = 1, // 普通預金
   TimeDeposit = 2, // 定期預金
-  AccumulationTimeDeposit = 69, // 積立定期預金
-  ForeignCurrencyDeposit = 3, // 外貨預金
+  AccumulationTimeDeposit = 69, // 積立定期預金 //非対応
+  ForeignCurrencyDeposit = 3, // 外貨預金 // 非対応
   DepositoryMoney_MRF = 5, // 預り金・MRF
   Deposit_Margin = 51, // 保証金・証拠金
   Cryptocurrency = 66, // 暗号資産
@@ -23,20 +23,20 @@ export enum AssetSubclass {
   OtherStocks = 17, // その他株式
 
   // 株式（信用）
-  CreditMargin_Deposit = 62, // 保証金・証拠金（信用）
-  DomesticStock_Credit = 57, // 国内株（信用）
+  CreditMargin_Deposit = 62, // 保証金・証拠金（信用） //非対応
+  DomesticStock_Credit = 57, // 国内株（信用） //非対応
   USStock_Credit = 58, // 米国株（信用）
   ChinaStock_Credit = 59, // 中国株（信用）
-  ForeignStock_Credit = 60, // 外国株（信用）
+  ForeignStock_Credit = 60, // 外国株（信用） //非対応
   OtherStocks_Credit = 61, // その他株式（信用）
 
   // 投資信託
   InvestmentTrust = 12, // 投資信託
-  ForeignInvestmentTrust = 52, // 外国投資信託
-  MidTermGovernmentBondFund = 53, // 中期国債ファンド
+  ForeignInvestmentTrust = 52, // 外国投資信託 //非対応
+  MidTermGovernmentBondFund = 53, // 中期国債ファンド //非対応
   MMF = 54, // MMF
   ForeignCurrencyMMF = 4, // 外貨MMF
-  OtherInvestmentTrust = 13, // その他投信
+  OtherInvestmentTrust = 13, // その他投信 //非対応
 
   // 債券
   GovernmentBond = 7, // 国債
@@ -63,16 +63,16 @@ export enum AssetSubclass {
   OtherFuturesOP = 27, // その他先物OP
 
   // ストックオプション
-  DomesticStock_StockOption = 70, // 国内株（ストックオプション）
+  DomesticStock_StockOption = 70, // 国内株（ストックオプション） //非対応
 
   // 保険
-  AccumulationTypeInsurance = 32, // 積立型保険
+  AccumulationTypeInsurance = 32, // 積立型保険 //非対応
 
   // 不動産
   Building_Home = 28, // 建物（自宅）
-  Building_InvestmentBusiness = 29, // 建物（投資・事業用）
+  Building_InvestmentBusiness = 29, // 建物（投資・事業用）//非対応
   Land_Home = 30, // 土地（自宅）
-  Land_InvestmentBusiness = 31, // 土地（投資・事業用）
+  Land_InvestmentBusiness = 31, // 土地（投資・事業用）// 非対応
 
   // 年金
   NationalPension = 33, // 国民年金
@@ -80,8 +80,8 @@ export enum AssetSubclass {
   MutualAidPension = 35, // 共済年金
   CorporatePension = 36, // 企業年金
   WelfarePensionFund = 37, // 厚生年金基金
-  NationalPensionFund = 38, // 国民年金基金
-  DefinedContributionPension = 39, // 確定拠出年金
+  NationalPensionFund = 38, // 国民年金基金  //非対応
+  DefinedContributionPension = 39, // 確定拠出年金  //非対応
   PrivatePension = 40, // 私的年金
 
   // ポイント
@@ -89,7 +89,7 @@ export enum AssetSubclass {
 
   // その他の資産
   Automobile = 41, // 自動車
-  PreciousMetals_Jewelry = 42, // 貴金属・宝石類
+  PreciousMetals_Jewelry = 42, // 貴金属・宝石類  //非対応
   OtherAssets = 43, // その他
 }
 
@@ -123,5 +123,40 @@ export class Portfolio extends ApiResponseHandler {
         : "",
     };
     return this.handleRequest("/bs/portfolio/new", postData);
+  }
+
+  public async getPortfolios(
+    accountId: ManualAccount
+  ): Promise<{ [key: string]: string }[]> {
+    const url = `/accounts/show_manual/${accountId.id}`;
+
+    return this.fetchData(url, ($) => {
+      const assetDetails: { [key: string]: string }[] = [];
+
+      $('form.form-horizontal[action="/bs/portfolio/edit"]').each((_, form) => {
+        let formId = $(form).attr("id");
+        const formInputs = $(form).find(".control-group input[id]");
+        const detail: { [key: string]: string } = {};
+
+        if (formId) {
+          formId = formId.replace("new_user_asset_det_", "");
+          detail.formId = formId;
+        }
+
+        formInputs.each((_, input) => {
+          const id = $(input).attr("id");
+          const value = $(input).val() as string;
+          if (id && value) {
+            detail[id] = value;
+          }
+        });
+
+        if (Object.keys(detail).length > 0) {
+          assetDetails.push(detail);
+        }
+      });
+
+      return assetDetails;
+    });
   }
 }

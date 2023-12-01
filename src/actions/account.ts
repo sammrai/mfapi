@@ -17,7 +17,7 @@ export enum AccountCategory {
 export interface ManualAccount {
   name: string;
   id: string;
-  subAccountIdHash: string | null;
+  subAccountIdHash: string;
 }
 
 export default AccountCategory;
@@ -59,14 +59,14 @@ export class Account extends ApiResponseHandler {
     return enrichedAccounts;
   }
 
-  public async getSubAccountIdHash(accountId: string): Promise<string | null> {
+  public async getSubAccountIdHash(accountId: string): Promise<string> {
     const url = `/accounts/show_manual/${accountId}`;
 
     return this.fetchData(url, ($) => {
       const value =
         $("#user_asset_det_sub_account_id_hash > option")
           .first()
-          .attr("value") || null;
+          .attr("value") || "";
       return value;
     });
   }
