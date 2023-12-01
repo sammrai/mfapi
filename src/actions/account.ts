@@ -1,17 +1,17 @@
 import { ApiResponseHandler } from "./api";
 
 export enum AccountCategory {
-  Bank = 2,            //銀行
-  Securities = 3,      //証券
-  InvestmentTrust = 4, //投信
-  CryptoFXMetals = 5,  //暗号資産・FX・貴金属
-  Card = 6,            //カード
-  Pension = 7,         //年金
-  EMoneyPrepaid = 8,   //電子マネー・プリペイド
-  Points = 9,          //ポイント
-  OnlineShopping = 12, //通販
-  Supermarket = 16,    //スーパー
-  OtherAssets = 14     //その他保有資産
+  Bank = 2, // 銀行
+  Securities = 3, // 証券
+  InvestmentTrust = 4, // 投信
+  CryptoFXMetals = 5, // 暗号資産・FX・貴金属
+  Card = 6, // カード
+  Pension = 7, // 年金
+  EMoneyPrepaid = 8, // 電子マネー・プリペイド
+  Points = 9, // ポイント
+  OnlineShopping = 12, // 通販
+  Supermarket = 16, // スーパー
+  OtherAssets = 14, // その他保有資産
 }
 
 export default AccountCategory;
