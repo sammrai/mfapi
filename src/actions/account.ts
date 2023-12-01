@@ -14,6 +14,12 @@ export enum AccountCategory {
   OtherAssets = 14, // その他保有資産
 }
 
+export interface ManualAccount {
+  name: string;
+  id: string;
+  subAccountIdHash: string | null;
+}
+
 export default AccountCategory;
 
 export class Account extends ApiResponseHandler {
@@ -26,8 +32,8 @@ export class Account extends ApiResponseHandler {
     return this.handleRequest("/accounts/manual_account", postData);
   }
 
-  public async getManualAccounts() {
-    return this.fetchData("/accounts", ($) => {
+  public async getManualAccounts(): Promise<ManualAccount[]> {
+    const accounts = await this.fetchData("/accounts", ($) => {
       const results: { name: string; id: string }[] = [];
       const cssSelector = "section.manual_accounts tr td:first-child a";
 
@@ -40,6 +46,28 @@ export class Account extends ApiResponseHandler {
       });
 
       return results;
+    });
+
+    // 各アカウントに対して getSubAccountIdHash を非同期的に呼び出す
+    const enrichedAccounts = await Promise.all(
+      accounts.map(async (account) => {
+        const subAccountIdHash = await this.getSubAccountIdHash(account.id);
+        return { ...account, subAccountIdHash };
+      })
+    );
+
+    return enrichedAccounts;
+  }
+
+  public async getSubAccountIdHash(accountId: string): Promise<string | null> {
+    const url = `/accounts/show_manual/${accountId}`;
+
+    return this.fetchData(url, ($) => {
+      const value =
+        $("#user_asset_det_sub_account_id_hash > option")
+          .first()
+          .attr("value") || null;
+      return value;
     });
   }
 

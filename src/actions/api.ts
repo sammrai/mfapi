@@ -43,7 +43,7 @@ export abstract class ApiResponseHandler {
   protected async handleRequest<T, U = T>(url: string, data?: T): Promise<U> {
     try {
       const response = await this.axiosInstance.post<U>(url, data);
-      console.log("SUCCESS:", response.data);
+      // console.log("SUCCESS:", response.data);
       return response.data;
     } catch (error) {
       console.error("ERROR:", error);

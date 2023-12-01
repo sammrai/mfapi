@@ -1,9 +1,10 @@
 import fs from "fs";
 import { Config } from "./config";
 import { checkAndLogin } from "./authentication";
-import { Asset } from "./actions/asset";
-import { Account, AccountCategory } from "./actions/account";
-// import { Account } from "./actions/account";
+// import { Asset } from "./actions/asset";
+// import { Account, AccountCategory } from "./actions/account";
+import { Account } from "./actions/account";
+import { Portfolio, AssetSubclass } from "./actions/portfolio";
 
 async function main() {
   const configPath = process.env.CONFIG_PATH ?? "config.json";
@@ -13,15 +14,21 @@ async function main() {
   const session = await checkAndLogin(config);
 
   // 取引内容を追加
-  const asset = new Asset(session);
-  await asset.addTransaction("テスト内容", 100);
+  // const asset = new Asset(session);
+  // await asset.addTransaction("テスト内容", 100);
 
   // 口座を制御
   const account = new Account(session);
-  await account.addManualAccount(AccountCategory.OtherAssets, "testaccount");
+  // await account.addManualAccount(AccountCategory.OtherAssets, "xxx");
   const a = await account.getManualAccounts();
   console.log(a);
-  await account.deleteAccount(a[0].id);
+  const portfolio = new Portfolio(session);
+  await portfolio.addPortfolioEntry(
+    a[0],
+    AssetSubclass.Cash,
+    `Cash${AssetSubclass.Cash}`,
+    100
+  );
 }
 
 (async () => {
