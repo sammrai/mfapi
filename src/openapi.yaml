@@ -1,0 +1,164 @@
+openapi: 3.0.0
+info:
+  title: Asset Management API
+  version: 1.0.0
+  description: API for managing assets in a portfolio.
+servers:
+  - url: http://192.168.32.70:3001
+    description: Local server
+  - url: http://localhost:3000/api
+    description: Local machinie
+
+paths:
+  /assets:
+    get:
+      summary: Get a list of all assets
+      responses:
+        '200':
+          description: A list of assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+    post:
+      summary: Create a new asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetPost'
+      responses:
+        '201':
+          description: Asset created
+        '400':
+          description: Invalid input
+
+  /assets/{assetId}:
+    delete:
+      summary: Delete an asset
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Asset deleted
+        '404':
+          description: Asset not found
+
+components:
+  schemas:
+    Asset:
+      type: object
+      properties:
+        assetId:
+          type: string
+          description: Unique identifier for the asset
+          example: "3GF7x1J_fYqVP90bzOT9CQ3gW-rwRV7PpNpjg1u3CEI"
+        subAccountIdHash:
+          type: string
+          description: Unique account id for the asset
+          example: "SxmuHwNlt9Ua10VeSgNtzl1yNxLHLsvDDrufWSVgUc8"
+        assetSubclassId:
+          $ref: '#/components/schemas/AssetSubclass'
+        name:
+          type: string
+          description: Name of the asset
+          example: "cache"
+        value:
+          type: number
+          format: float
+          description: Value of the asset
+          example: 100
+        entriedPrice:
+          type: number
+          format: float
+          description: Price of the asset when it was entered into the system
+          example: 90
+          nullable: true
+        entriedAt:
+          type: string
+          format: string
+          description: Date when the asset was entered into the system
+          example: "2022/01/01"
+          nullable: true
+    AssetSubclass:
+      type: string
+      enum:
+        - Cash
+        - ElectronicMoney
+        - OrdinaryDeposit
+        - TimeDeposit
+        - AccumulationTimeDeposit
+        - ForeignCurrencyDeposit
+        - DepositoryMoney_MRF
+        - Deposit_Margin
+        - Cryptocurrency
+        - OtherDeposits
+        - DomesticStock
+        - USStock
+        - ChinaStock
+        - ForeignStock
+        - UnlistedStock
+        - OtherStocks
+        - CreditMargin_Deposit
+        - DomesticStock_Credit
+        - USStock_Credit
+        - ChinaStock_Credit
+        - ForeignStock_Credit
+        - OtherStocks_Credit
+        - InvestmentTrust
+        - ForeignInvestmentTrust
+        - MidTermGovernmentBondFund
+        - MMF
+        - ForeignCurrencyMMF
+        - OtherInvestmentTrust
+        - GovernmentBond
+        - CorporateBond
+        - ForeignBond
+        - StructuredBond
+        - OtherBonds
+        - SocialLending
+        - FXMargin
+        - OverTheCounterFX
+        - Click365
+        - OsakaFX
+        - OtherFX
+        - FuturesOPMargin
+        - IndexFutures
+        - IndexOP
+        - CFD
+        - ClickStock365
+        - CommodityFutures
+        - OtherFuturesOP
+        - DomesticStock_StockOption
+        - AccumulationTypeInsurance
+        - Building_Home
+        - Building_InvestmentBusiness
+        - Land_Home
+        - Land_InvestmentBusiness
+        - NationalPension
+        - WelfarePension
+        - MutualAidPension
+        - CorporatePension
+        - WelfarePensionFund
+        - NationalPensionFund
+        - DefinedContributionPension
+        - PrivatePension
+        - Points_Miles
+        - Automobile
+        - PreciousMetals_Jewelry
+        - OtherAssets
+      description: 資産のサブクラスID
+    AssetPost:
+      allOf:
+        - $ref: '#/components/schemas/Asset'
+      required:
+        - assetSubclassId
+        - name
+        - value

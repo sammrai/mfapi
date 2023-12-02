@@ -32,11 +32,11 @@ export enum AssetSubclass {
 
   // 投資信託
   InvestmentTrust = 12, // 投資信託
-  ForeignInvestmentTrust = 52, // 外国投資信託 //非対応
-  MidTermGovernmentBondFund = 53, // 中期国債ファンド //非対応
+  ForeignInvestmentTrust = 52, // 外国投資信託
+  MidTermGovernmentBondFund = 53, // 中期国債ファンド
   MMF = 54, // MMF
   ForeignCurrencyMMF = 4, // 外貨MMF
-  OtherInvestmentTrust = 13, // その他投信 //非対応
+  OtherInvestmentTrust = 13, // その他投信
 
   // 債券
   GovernmentBond = 7, // 国債
@@ -94,12 +94,13 @@ export enum AssetSubclass {
 }
 
 export interface PortfolioModel {
-  portfolioId: string;
-  sub_account_id_hash: string;
-  temp_asset_subclass_id: string;
-  asset_subclass_id: string;
+  assetId: string;
+  subAccountIdHash: string;
+  assetSubclassId: string;
   name: string;
   value: number;
+  entriedPrice: number;
+  entriedAt: string;
 }
 
 export class Portfolio extends ApiResponseHandler {
@@ -148,7 +149,7 @@ export class Portfolio extends ApiResponseHandler {
         const detail: Partial<PortfolioModel> = {};
 
         if (formId) {
-          detail.portfolioId = formId;
+          detail.assetId = formId;
         }
 
         formInputs.each((_, input) => {
@@ -158,19 +159,24 @@ export class Portfolio extends ApiResponseHandler {
           if (id && value) {
             switch (id.replace("user_asset_det_", "")) {
               case "sub_account_id_hash":
-                detail.sub_account_id_hash = value;
+                detail.subAccountIdHash = value;
                 break;
               case "temp_asset_subclass_id":
-                detail.temp_asset_subclass_id = value;
                 break;
               case "asset_subclass_id":
-                detail.asset_subclass_id = value;
+                detail.assetSubclassId = AssetSubclass[parseInt(value, 10)];
                 break;
               case "name":
                 detail.name = value;
                 break;
               case "value":
                 detail.value = parseInt(value, 10); // 数値に変換
+                break;
+              case "entried_price":
+                detail.entriedPrice = parseInt(value, 10); // 数値に変換
+                break;
+              case "entried_at":
+                detail.entriedAt = value;
                 break;
             }
           }
@@ -185,12 +191,14 @@ export class Portfolio extends ApiResponseHandler {
     });
   }
 
-  public async deletePortfolio(portfolio: PortfolioModel): Promise<void> {
-    const url = `/bs/portfolio/${portfolio.portfolioId}?sub_account_id_hash=${portfolio.sub_account_id_hash}`;
+  public async deletePortfolio(
+    manualAccount: ManualAccount,
+    assetId: string
+    ): Promise<void> {
+    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${manualAccount.subAccountIdHash}`;
     const postData = {
       _method: "delete",
     };
-    console.log(url);
     return this.post(url, postData);
   }
 }
