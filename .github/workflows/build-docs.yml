@@ -21,4 +21,3 @@ jobs:
         publish_dir: .
         force_orphan: true
         exclude_assets: '.github,openapi,.redocly.yaml,LICENSE,README.md,make.sh'
-        cname: docs.api.jizt.it
