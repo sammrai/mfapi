@@ -1,8 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Asset Management API
-  version: 1.0.0
-  description: API for managing assets in a portfolio.
+  title: マネーフォワード操作API
+  version: 0.0.1
+  description: |
+    マネーフォワードME を操作するAPIラッパーを提供。参照系は問題なく動作しますが更新系は更新結果の応答をサイトから得られないため実際に更新できているか確認が必要です。
+
+  contact:
+    url: https://github.com/sammrai/mfapi
+
 servers:
   - url: http://192.168.32.70:3001
     description: Local server
@@ -12,8 +17,9 @@ servers:
 paths:
   /accounts:
     get:
-      tags: [Account]
-      summary: Get a list of all accounts
+      tags: [口座]
+      summary: 口座一覧
+      description: 作成したカスタム口座一覧を取得できます
       responses:
         "200":
           description: A list of accounts
@@ -25,18 +31,19 @@ paths:
                   $ref: "#/components/schemas/Account"
   /accounts/{accountString}/assets:
     get:
-      tags: [Asset]
-      summary: Get a list of all assets
+      tags: [資産]
+      summary: 資産一覧
+      description: 口座内の資産を一覧で取得できます
       parameters:
         - name: accountString
-          description: アカウントの接続文字列
+          description: 口座の接続文字列
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: A list of assets
+          description: 資産一覧
           content:
             application/json:
               schema:
@@ -44,11 +51,11 @@ paths:
                 items:
                   $ref: "#/components/schemas/Asset"
     post:
-      tags: [Asset]
-      summary: Create a new asset
+      tags: [資産]
+      summary: 資産作成
       parameters:
         - name: accountString
-          description: アカウントの接続文字列
+          description: 口座の接続文字列
           in: path
           required: true
           schema:
@@ -61,14 +68,14 @@ paths:
               $ref: "#/components/schemas/AssetPost"
       responses:
         "201":
-          description: Asset created
+          description: 資産を作成しました
         "400":
-          description: Invalid input
+          description: 入力パラメータが誤っています
 
   /accounts/{accountString}/assets/{assetId}:
     delete:
-      tags: [Asset]
-      summary: Delete an asset
+      tags: [資産]
+      summary: 資産削除
       parameters:
         - name: assetId
           description: 資産の一意識別子
@@ -77,16 +84,16 @@ paths:
           schema:
             type: string
         - name: accountString
-          description: アカウントの接続文字列
+          description: 口座の接続文字列
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: Asset deleted
+          description: 資産を削除しました
         "404":
-          description: Asset not found
+          description: 削除する資産が見つかりません
 
 components:
   schemas:
@@ -95,29 +102,29 @@ components:
       properties:
         assetId:
           type: string
-          description: Unique identifier for the asset
+          description: 資産のユニーク識別子
           example: "3GF7x1J_fYqVP90bzOT9CQ3gW-rwRV7PpNpjg1u3CEI"
         assetSubclassId:
           $ref: "#/components/schemas/AssetSubclass"
         name:
           type: string
-          description: Name of the asset
-          example: "cache"
+          description: 資産名
+          example: "USD/JPY"
         value:
           type: number
           format: float
-          description: Value of the asset
+          description: 資産価値
           example: 100
         entriedPrice:
           type: number
           format: float
-          description: Price of the asset when it was entered into the system
+          description: システム登録時の価格
           example: 90
           nullable: true
         entriedAt:
           type: string
           format: string
-          description: Date when the asset was entered into the system
+          description: システム登録日
           example: "2022/01/01"
           nullable: true
     AssetSubclass:
@@ -200,13 +207,13 @@ components:
       properties:
         name:
           type: string
-          description: アカウントの名前
+          description: 口座の名前
         id:
           type: string
-          description: アカウントの一意識別子
+          description: 口座の一意識別子
         subAccountIdHash:
           type: string
-          description: アカウント制御の一意識別子
+          description: 口座制御の一意識別子
         accountString:
           type: string
-          description: アカウントの接続文字列
+          description: 口座の接続文字列

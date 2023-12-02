@@ -50,3 +50,6 @@ jobs:
 
       - name: Run compile 🏗️
         run: yarn compile
+      
+      - name: Doc build test
+        run: npx @redocly/cli build-docs ./src/openapi.yaml
