@@ -15,14 +15,14 @@ paths:
       tags: [Account]
       summary: Get a list of all accounts
       responses:
-        '200':
+        "200":
           description: A list of accounts
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Account'
+                  $ref: "#/components/schemas/Account"
   /accounts/{accountString}/assets:
     get:
       tags: [Asset]
@@ -35,14 +35,14 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: A list of assets
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Asset'
+                  $ref: "#/components/schemas/Asset"
     post:
       tags: [Asset]
       summary: Create a new asset
@@ -58,11 +58,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssetPost'
+              $ref: "#/components/schemas/AssetPost"
       responses:
-        '201':
+        "201":
           description: Asset created
-        '400':
+        "400":
           description: Invalid input
 
   /accounts/{accountString}/assets/{assetId}:
@@ -83,9 +83,9 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Asset deleted
-        '404':
+        "404":
           description: Asset not found
 
 components:
@@ -98,7 +98,7 @@ components:
           description: Unique identifier for the asset
           example: "3GF7x1J_fYqVP90bzOT9CQ3gW-rwRV7PpNpjg1u3CEI"
         assetSubclassId:
-          $ref: '#/components/schemas/AssetSubclass'
+          $ref: "#/components/schemas/AssetSubclass"
         name:
           type: string
           description: Name of the asset
@@ -190,7 +190,7 @@ components:
       description: 資産のサブクラスID
     AssetPost:
       allOf:
-        - $ref: '#/components/schemas/Asset'
+        - $ref: "#/components/schemas/Asset"
       required:
         - assetSubclassId
         - name

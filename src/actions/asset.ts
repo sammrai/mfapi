@@ -133,9 +133,7 @@ export class Asset extends ApiResponseHandler {
     return this.post("/bs/portfolio/new", postData);
   }
 
-  public async getAssets(
-    accountString: string
-  ): Promise<AssetModel[]> {
+  public async getAssets(accountString: string): Promise<AssetModel[]> {
     const url = `/accounts/show_manual/${accountString.split("@")[0]}`;
 
     return this.get(url, ($) => {
@@ -191,11 +189,13 @@ export class Asset extends ApiResponseHandler {
   public async deleteAsset(
     accountString: string,
     assetId: string
-    ): Promise<void> {
-    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${accountString.split("@")[1]}`;
+  ): Promise<void> {
+    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${
+      accountString.split("@")[1]
+    }`;
     const postData = {
       _method: "delete",
     };
-        return this.post(url, postData);
+    return this.post(url, postData);
   }
 }
