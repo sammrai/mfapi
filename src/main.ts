@@ -52,25 +52,14 @@ async function main() {
     });
   });
 
-  // エラーハンドリングミドルウェア
-  app.use((err: any, _req: Request, res: Response, next: express.NextFunction) => {
-    // バリデーションエラーの場合
-    if (err.status === 400) {
-      res.status(400).send(err);
-    } else {
-      next(err);
-    }
-  });
-
   // 資産一覧取得
   app.get('/assets', async (_req: Request, res: Response) => {
     try {
       const portfolio = new Asset(session); 
       const portfolios : AssetModel[] = await portfolio.getAssets(manualAccounts[0]); 
       res.status(200).json(portfolios);
-      // res.status(200).json([{"portfolios":1}]);
     } catch (error) {
-      res.status(500).send({ message: "error" });
+      res.status(404).send();
     }
   });
 
@@ -83,7 +72,7 @@ async function main() {
       await portfolio.addAsset(manualAccounts[0], _assetSubclassId, name, value)
       res.status(201).send()
     } catch (error) {
-      res.status(500).send({ message: "error" });
+      res.status(500).send();
     }
   });
 
@@ -95,7 +84,7 @@ async function main() {
       await portfolio.deleteAsset(manualAccounts[0], assetId );
       res.status(200).send();
     } catch (error) {
-      res.status(500).send({ message: "error" });
+      res.status(404).send();
     }
   });
 

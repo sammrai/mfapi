@@ -60,10 +60,6 @@ components:
           type: string
           description: Unique identifier for the asset
           example: "3GF7x1J_fYqVP90bzOT9CQ3gW-rwRV7PpNpjg1u3CEI"
-        subAccountIdHash:
-          type: string
-          description: Unique account id for the asset
-          example: "SxmuHwNlt9Ua10VeSgNtzl1yNxLHLsvDDrufWSVgUc8"
         assetSubclassId:
           $ref: '#/components/schemas/AssetSubclass'
         name:

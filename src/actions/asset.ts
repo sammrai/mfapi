@@ -95,7 +95,6 @@ export enum AssetSubclass {
 
 export interface AssetModel {
   assetId: string;
-  subAccountIdHash: string;
   assetSubclassId: string;
   name: string;
   value: number;
@@ -136,9 +135,9 @@ export class Asset extends ApiResponseHandler {
   }
 
   public async getAssets(
-    accountId: ManualAccount
+    manualAccount: ManualAccount
   ): Promise<AssetModel[]> {
-    const url = `/accounts/show_manual/${accountId.id}`;
+    const url = `/accounts/show_manual/${manualAccount.id}`;
 
     return this.get(url, ($) => {
       const assetDetails: AssetModel[] = [];
@@ -159,7 +158,6 @@ export class Asset extends ApiResponseHandler {
           if (id && value) {
             switch (id.replace("user_asset_det_", "")) {
               case "sub_account_id_hash":
-                detail.subAccountIdHash = value;
                 break;
               case "temp_asset_subclass_id":
                 break;
@@ -199,6 +197,6 @@ export class Asset extends ApiResponseHandler {
     const postData = {
       _method: "delete",
     };
-    return this.post(url, postData);
+        return this.post(url, postData);
   }
 }
