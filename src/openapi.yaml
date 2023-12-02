@@ -4,7 +4,7 @@ info:
   version: 0.0.1
   description: |
     マネーフォワードME を操作するAPIラッパーを提供。参照系は問題なく動作しますが更新系は更新結果の応答をサイトから得られないため実際に更新できているか確認が必要です。
-  
+
   contact:
     url: https://github.com/sammrai/mfapi
 
