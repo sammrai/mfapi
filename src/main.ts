@@ -16,9 +16,8 @@ async function main() {
   const config: Config = JSON.parse(fs.readFileSync(configPath, "utf8"));
   const session = await checkAndLogin(config);
 
-  const account = new Account(session);
-  const manualAccounts = await account.getManualAccounts();
-  console.log(manualAccounts)
+  const accountController = new Account(session);
+  const assetController = new Asset(session);
 
   const app = express();
   app.use(express.json());
@@ -52,36 +51,41 @@ async function main() {
     });
   });
 
-  // 資産一覧取得
-  app.get('/assets', async (_req: Request, res: Response) => {
+
+  // アカウント
+  app.get('/accounts', async (_req: Request, res: Response) => {
     try {
-      const portfolio = new Asset(session); 
-      const portfolios : AssetModel[] = await portfolio.getAssets(manualAccounts[0]); 
-      res.status(200).json(portfolios);
+      const manualAccounts = await accountController.getManualAccounts();
+      res.status(200).json(manualAccounts);
     } catch (error) {
       res.status(404).send();
     }
   });
 
-  // 追加
-  app.post('/assets', async (req: Request, res: Response) => {
+  
+  // 資産
+  app.get('/accounts/:accountString/assets', async (req: Request, res: Response) => {
+      const {accountString } = req.params;
+      const portfolios : AssetModel[] = await assetController.getAssets(accountString); 
+      res.status(200).json(portfolios);
+  });
+
+  app.post('/accounts/:accountString/assets', async (req: Request, res: Response) => {
     try {
+      const {accountString } = req.params;
       const { assetSubclassId, name, value } = req.body;
-      const portfolio = new Asset(session);
       const _assetSubclassId = AssetSubclass[assetSubclassId as keyof typeof AssetSubclass];
-      await portfolio.addAsset(manualAccounts[0], _assetSubclassId, name, value)
+      await assetController.addAsset(accountString, _assetSubclassId, name, value)
       res.status(201).send()
     } catch (error) {
       res.status(500).send();
     }
   });
 
-  // 削除
-  app.delete('/assets/:assetId', async (req: Request, res: Response) => {
+  app.delete('/accounts/:accountString/assets/:assetId', async (req: Request, res: Response) => {
     try {
-      const { assetId } = req.params;
-      const portfolio = new Asset(session);
-      await portfolio.deleteAsset(manualAccounts[0], assetId );
+      const {accountString, assetId } = req.params;
+      await assetController.deleteAsset(accountString, assetId );
       res.status(200).send();
     } catch (error) {
       res.status(404).send();

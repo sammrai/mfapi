@@ -1,5 +1,4 @@
 import { ApiResponseHandler } from "./api";
-import { ManualAccount } from "./account";
 
 export enum AssetSubclass {
   // 預金・現金・暗号資産
@@ -112,7 +111,7 @@ export class Asset extends ApiResponseHandler {
   }
 
   public async addAsset(
-    manualAccount: ManualAccount,
+    accountString: string,
     assetSubclassId: AssetSubclass,
     assetName: string,
     assetValue: number,
@@ -121,7 +120,7 @@ export class Asset extends ApiResponseHandler {
   ) {
     const postData = {
       "user_asset_det[id]": "",
-      "user_asset_det[sub_account_id_hash]": manualAccount.subAccountIdHash,
+      "user_asset_det[sub_account_id_hash]": accountString.split("@")[1],
       "user_asset_det[asset_subclass_id]": assetSubclassId,
       "user_asset_det[name]": assetName,
       "user_asset_det[value]": assetValue,
@@ -135,9 +134,9 @@ export class Asset extends ApiResponseHandler {
   }
 
   public async getAssets(
-    manualAccount: ManualAccount
+    accountString: string
   ): Promise<AssetModel[]> {
-    const url = `/accounts/show_manual/${manualAccount.id}`;
+    const url = `/accounts/show_manual/${accountString.split("@")[0]}`;
 
     return this.get(url, ($) => {
       const assetDetails: AssetModel[] = [];
@@ -190,10 +189,10 @@ export class Asset extends ApiResponseHandler {
   }
 
   public async deleteAsset(
-    manualAccount: ManualAccount,
+    accountString: string,
     assetId: string
     ): Promise<void> {
-    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${manualAccount.subAccountIdHash}`;
+    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${accountString.split("@")[1]}`;
     const postData = {
       _method: "delete",
     };

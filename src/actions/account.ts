@@ -18,6 +18,7 @@ export interface ManualAccount {
   name: string;
   id: string;
   subAccountIdHash: string;
+  accountString: string;
 }
 
 export default AccountCategory;
@@ -52,7 +53,8 @@ export class Account extends ApiResponseHandler {
     const enrichedAccounts = await Promise.all(
       accounts.map(async (account) => {
         const subAccountIdHash = await this.getSubAccountIdHash(account.id);
-        return { ...account, subAccountIdHash };
+        const accountString = `${account.id}@${subAccountIdHash}`;
+        return { ...account, subAccountIdHash, accountString };
       })
     );
 
