@@ -18,6 +18,7 @@ export interface ManualAccount {
   name: string;
   id: string;
   subAccountIdHash: string;
+  accountString: string;
 }
 
 export default AccountCategory;
@@ -29,11 +30,11 @@ export class Account extends ApiResponseHandler {
       "new_manual_account[name]": name,
     };
 
-    return this.handleRequest("/accounts/manual_account", postData);
+    return this.post("/accounts/manual_account", postData);
   }
 
   public async getManualAccounts(): Promise<ManualAccount[]> {
-    const accounts = await this.fetchData("/accounts", ($) => {
+    const accounts = await this.get("/accounts", ($) => {
       const results: { name: string; id: string }[] = [];
       const cssSelector = "section.manual_accounts tr td:first-child a";
 
@@ -52,7 +53,8 @@ export class Account extends ApiResponseHandler {
     const enrichedAccounts = await Promise.all(
       accounts.map(async (account) => {
         const subAccountIdHash = await this.getSubAccountIdHash(account.id);
-        return { ...account, subAccountIdHash };
+        const accountString = `${account.id}@${subAccountIdHash}`;
+        return { ...account, subAccountIdHash, accountString };
       })
     );
 
@@ -62,7 +64,7 @@ export class Account extends ApiResponseHandler {
   public async getSubAccountIdHash(accountId: string): Promise<string> {
     const url = `/accounts/show_manual/${accountId}`;
 
-    return this.fetchData(url, ($) => {
+    return this.get(url, ($) => {
       const value =
         $("#user_asset_det_sub_account_id_hash > option")
           .first()
@@ -77,6 +79,6 @@ export class Account extends ApiResponseHandler {
       account_id_hash: accountIdHash,
     };
 
-    return this.handleRequest("/accounts", postData);
+    return this.post("/accounts", postData);
   }
 }
