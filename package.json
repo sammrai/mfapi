@@ -20,7 +20,10 @@
     "lint:tsc": "tsc",
     "fix": "run-s fix:prettier fix:eslint",
     "fix:eslint": "eslint . --ext ts,tsx --fix",
-    "fix:prettier": "prettier --write src"
+    "fix:prettier": "prettier --write src",
+    "watch-openapi": "nodemon --watch ./src/openapi.yaml --exec \"npx @redocly/cli build-docs ./src/openapi.yaml -o ./src/index.html --theme.openapi.disableSearch=true --theme.openapi.expandResponses='200,201'\"",
+    "serve-docs": "http-server src -p 3001",
+    "redoc": "npm-run-all --parallel watch-openapi serve-docs"
   },
   "devDependencies": {
     "@types/node": "20.10.1",

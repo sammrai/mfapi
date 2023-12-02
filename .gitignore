@@ -6,3 +6,4 @@ config.json
 *.env
 src/package.json
 src/yarn.lock
+src/index.html
