@@ -131,7 +131,7 @@ export class Portfolio extends ApiResponseHandler {
         ? this.formatDate(assetEntryAt)
         : "",
     };
-    return this.handleRequest("/bs/portfolio/new", postData);
+    return this.post("/bs/portfolio/new", postData);
   }
 
   public async getPortfolios(
@@ -139,7 +139,7 @@ export class Portfolio extends ApiResponseHandler {
   ): Promise<PortfolioModel[]> {
     const url = `/accounts/show_manual/${accountId.id}`;
 
-    return this.fetchData(url, ($) => {
+    return this.get(url, ($) => {
       const assetDetails: PortfolioModel[] = [];
 
       $('form.form-horizontal[action="/bs/portfolio/edit"]').each((_, form) => {
@@ -191,6 +191,6 @@ export class Portfolio extends ApiResponseHandler {
       _method: "delete",
     };
     console.log(url);
-    return this.handleRequest(url, postData);
+    return this.post(url, postData);
   }
 }

@@ -40,7 +40,7 @@ export abstract class ApiResponseHandler {
     return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; ");
   }
 
-  protected async handleRequest<T, U = T>(url: string, data?: T): Promise<U> {
+  protected async post<T, U = T>(url: string, data?: T): Promise<U> {
     try {
       const response = await this.axiosInstance.post<U>(url, data);
       // console.log("SUCCESS:", response.data);
@@ -51,7 +51,7 @@ export abstract class ApiResponseHandler {
     }
   }
 
-  protected async fetchData<T>(
+  protected async get<T>(
     url: string,
     decorator: (cheerio: CheerioAPI) => T
   ): Promise<T> {

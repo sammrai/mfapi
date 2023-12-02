@@ -11,6 +11,6 @@ export class Asset extends ApiResponseHandler {
       "user_asset_act[sub_account_id_hash]": "0",
       "user_asset_act[content]": content,
     };
-    return this.handleRequest("/user_asset_acts", postData);
+    return this.post("/user_asset_acts", postData);
   }
 }
