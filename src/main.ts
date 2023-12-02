@@ -6,7 +6,7 @@ import redocExpress  from 'redoc-express';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
-import { Portfolio, PortfolioModel, AssetSubclass } from './actions/portfolio';
+import { Asset, AssetModel, AssetSubclass } from './actions/asset';
 import { Config } from "./config";
 import { checkAndLogin } from "./authentication";
 import { Account } from "./actions/account";
@@ -65,8 +65,8 @@ async function main() {
   // 資産一覧取得
   app.get('/assets', async (_req: Request, res: Response) => {
     try {
-      const portfolio = new Portfolio(session); 
-      const portfolios : PortfolioModel[] = await portfolio.getPortfolios(manualAccounts[0]); 
+      const portfolio = new Asset(session); 
+      const portfolios : AssetModel[] = await portfolio.getAssets(manualAccounts[0]); 
       res.status(200).json(portfolios);
       // res.status(200).json([{"portfolios":1}]);
     } catch (error) {
@@ -78,9 +78,9 @@ async function main() {
   app.post('/assets', async (req: Request, res: Response) => {
     try {
       const { assetSubclassId, name, value } = req.body;
-      const portfolio = new Portfolio(session);
+      const portfolio = new Asset(session);
       const _assetSubclassId = AssetSubclass[assetSubclassId as keyof typeof AssetSubclass];
-      await portfolio.addPortfolio(manualAccounts[0], _assetSubclassId, name, value)
+      await portfolio.addAsset(manualAccounts[0], _assetSubclassId, name, value)
       res.status(201).send()
     } catch (error) {
       res.status(500).send({ message: "error" });
@@ -91,8 +91,8 @@ async function main() {
   app.delete('/assets/:assetId', async (req: Request, res: Response) => {
     try {
       const { assetId } = req.params;
-      const portfolio = new Portfolio(session);
-      await portfolio.deletePortfolio(manualAccounts[0], assetId );
+      const portfolio = new Asset(session);
+      await portfolio.deleteAsset(manualAccounts[0], assetId );
       res.status(200).send();
     } catch (error) {
       res.status(500).send({ message: "error" });
