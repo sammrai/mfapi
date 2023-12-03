@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    image: sammrai/mfapi:latest
+    container_name: mfapi
+    ports:
+      - 3001:3001
     volumes:
       - type: bind
         source: ./data
@@ -10,3 +13,10 @@ services:
       - type: bind
         source: ./config.json
         target: /app/config.json
+    # 開発用
+    #   - type: bind
+    #     source: ./src
+    #     target: /app/src
+    # build: .
+    # command: /bin/sh
+    # tty: true

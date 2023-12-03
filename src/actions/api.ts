@@ -44,7 +44,7 @@ export abstract class ApiResponseHandler {
     try {
       const response = await this.axiosInstance.post<U>(url, data);
       // console.log("SUCCESS:", response.data);
-      console.log("Status Code: ", response.status);
+      console.log("post", url, response.status);
       // console.log("Response Headers: ", response.headers);
       return response.data;
     } catch (error) {
@@ -58,7 +58,7 @@ export abstract class ApiResponseHandler {
     decorator: (cheerio: CheerioAPI) => T
   ): Promise<T> {
     const response = await this.axiosInstance.get(url);
-    console.log("Status Code: ", response.status);
+    console.log("get", url, response.status);
     // console.log("Response Headers: ", response.headers);
     const $ = cheerio.load(response.data);
     return decorator($);

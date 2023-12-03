@@ -1,9 +1,12 @@
 openapi: 3.0.0
 info:
   title: マネーフォワード操作API
-  version: 0.0.1
+  version: 0.0.2
   description: |
-    マネーフォワードME を操作するAPIラッパーを提供。参照系は問題なく動作しますが更新系は更新結果の応答をサイトから得られないため実際に更新できているか確認が必要です。
+    マネーフォワードMEのデータを操作するためのREST APIです。このAPIは、マネーフォワードMEの資産管理機能を拡張し、プログラムによる自動操作を可能にします。
+
+    # ensureオプション（開発中）
+    現状では、更新系API（追加、更新、削除など）では、2xx応答が返ってきても、それはサイトにリクエストを投げたことを示すだけで、実際に作成、更新、削除が行われたことの保証はされません。そのため、操作後にリソースの状態を確認し、変更が正確に反映されているかを確かめることが重要です。この確認プロセスを効率化するために、`ensure` オプションが推奨されます。`ensure` オプションを有効化すると、操作後にリソースの状態を自動的に確認する追加のリクエストが発行されますが、これにより全体のリクエスト量が増加し、応答時間が遅くなる可能性があります。また、、サイトへの追加的な負荷も考慮に入れる必要があります。クライアントの要件に応じて、`ensure` オプションの使用要否を検討してください。
 
   contact:
     url: https://github.com/sammrai/mfapi
@@ -11,7 +14,7 @@ info:
 servers:
   - url: http://192.168.32.70:3001
     description: Local server
-  - url: http://localhost:3000/api
+  - url: http://localhost:3001/api
     description: Local machinie
 
 paths:
@@ -50,6 +53,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Asset"
+        "500":
+          description: サーバエラー
     post:
       tags: [資産]
       summary: 資産作成
@@ -71,6 +76,10 @@ paths:
           description: 資産を作成しました
         "400":
           description: 入力パラメータが誤っています
+        "409":
+          description: 作成に失敗しました
+        "500":
+          description: サーバエラー
 
   /accounts/{accountString}/assets/{assetId}:
     delete:
@@ -90,10 +99,48 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "204":
           description: 資産を削除しました
+        "409":
+          description: 削除に失敗しました
         "404":
           description: 削除する資産が見つかりません
+        "500":
+          description: サーバエラー
+    put:
+      tags: [資産]
+      summary: 資産変更
+      parameters:
+        - name: assetId
+          description: 資産の一意識別子
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: accountString
+          description: 口座の接続文字列
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: assetSubclassIdは変更することができず、変更前と同じにする必要があります。
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetPost"
+      responses:
+        "204":
+          description: 資産を更新しました
+        "400":
+          description: 入力パラメータが誤っています
+        "404":
+          description: 更新する資産が見つかりません
+        "409":
+          description: 更新に失敗しました
+        "500":
+          description: サーバエラー
 
 components:
   schemas:
@@ -103,7 +150,7 @@ components:
         assetId:
           type: string
           description: 資産のユニーク識別子
-          example: "3GF7x1J_fYqVP90bzOT9CQ3gW-rwRV7PpNpjg1u3CEI"
+          example: "rwR7x1J_fYqVP90bV7PpN3GFzOT9CQ3gW-pjg1u3CEI"
         assetSubclassId:
           $ref: "#/components/schemas/AssetSubclass"
         name:
@@ -123,7 +170,6 @@ components:
           nullable: true
         entriedAt:
           type: string
-          format: string
           description: システム登録日
           example: "2022/01/01"
           nullable: true
@@ -208,12 +254,16 @@ components:
         name:
           type: string
           description: 口座の名前
+          example: カスタムテスト口座名
         id:
           type: string
           description: 口座の一意識別子
+          example: 1oSPZ6UHFklEcqxptwmUi8AsOLXZ-c895CO9eXbmo9j
         subAccountIdHash:
           type: string
           description: 口座制御の一意識別子
+          example: Slt9Ua10VeSgHLsvDDxmuHwNrufWSVgUc8Ntzl1yNxL
         accountString:
           type: string
           description: 口座の接続文字列
+          example: 1oSPZ6UHFklEcqxptwmUi8AsOLXZ-c895CO9eXbmo9j@Slt9Ua10VeSgHLsvDDxmuHwNrufWSVgUc8Ntzl1yNxL
