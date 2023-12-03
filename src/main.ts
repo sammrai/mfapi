@@ -75,13 +75,13 @@ async function main() {
   app.get(
     "/accounts/:accountString/assets",
     async (req: Request, res: Response) => {
-      try{
+      try {
         const { accountString } = req.params;
         const portfolios: AssetModel[] = await assetController.getAssets(
           accountString
-      );
+        );
         res.status(200).json(portfolios);
-      }catch (error) {
+      } catch (error) {
         res.status(500).send();
       }
     }

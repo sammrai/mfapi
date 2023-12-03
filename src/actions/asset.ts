@@ -157,7 +157,7 @@ export class Asset extends ApiResponseHandler {
               case "sub_account_id_hash":
                 break;
               case "id":
-                detail.assetId += `@${value}`
+                detail.assetId += `@${value}`;
                 break;
               case "temp_asset_subclass_id":
                 break;
@@ -218,10 +218,12 @@ export class Asset extends ApiResponseHandler {
       "user_asset_det[asset_subclass_id]": assetSubclassId,
       "user_asset_det[name]": assetName,
       "user_asset_det[value]": assetValue,
-      "user_asset_det[entried_price]": assetEntryValue !== undefined ? assetEntryValue : "",
-      "user_asset_det[entried_at]": assetEntryAt ? this.formatDate(assetEntryAt) : "",
+      "user_asset_det[entried_price]":
+        assetEntryValue !== undefined ? assetEntryValue : "",
+      "user_asset_det[entried_at]": assetEntryAt
+        ? this.formatDate(assetEntryAt)
+        : "",
     };
     return this.post("/bs/portfolio/edit", postData);
   }
-  
 }

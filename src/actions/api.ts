@@ -58,7 +58,7 @@ export abstract class ApiResponseHandler {
     decorator: (cheerio: CheerioAPI) => T
   ): Promise<T> {
     const response = await this.axiosInstance.get(url);
-      console.log("get", url, response.status);
+    console.log("get", url, response.status);
     // console.log("Response Headers: ", response.headers);
     const $ = cheerio.load(response.data);
     return decorator($);
