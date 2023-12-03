@@ -1,36 +1,38 @@
-FROM zenika/alpine-chrome:with-puppeteer-xvfb as runner
+FROM alpine:latest as base
 
-# hadolint ignore=DL3002
-USER root
-
-# hadolint ignore=DL3018
-RUN apk upgrade --no-cache --available && \
-  apk update && \
-  apk add --no-cache \
-  x11vnc \
-  && \
-  apk add --update --no-cache tzdata && \
-  cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
-  echo "Asia/Tokyo" > /etc/timezone && \
-  apk del tzdata
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    nodejs \
+    yarn
 
 WORKDIR /app
-
+COPY src/ ./src/
 COPY package.json yarn.lock ./
 
-RUN echo network-timeout 600000 > .yarnrc && \
-  yarn install --frozen-lockfile && \
-  yarn cache clean
+RUN yarn install --frozen-lockfile && yarn cache clean
 
-COPY src/ src/
+RUN rm -rf /var/cache/apk/* /tmp/*
+
 COPY tsconfig.json .eslintignore .eslintrc.yml .
+RUN yarn compile
+
+FROM alpine:latest
+COPY --from=base /app /app
+WORKDIR /app
+
+RUN apk add --no-cache yarn tini
+
+ENV TZ=Asia/Tokyo \
+    DISPLAY=:99 \
+    CHROMIUM_PATH=/usr/bin/chromium-browser
 
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
-
-ENV TZ Asia/Tokyo
-ENV DISPLAY :99
-ENV CHROMIUM_PATH /usr/bin/chromium-browser
-
 ENTRYPOINT ["tini", "--"]
 CMD ["/app/entrypoint.sh"]
