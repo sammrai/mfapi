@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/*
+!data/.gitkeep
+config.json
+*.env
+src/package.json
+src/yarn.lock
+src/index.html
