@@ -141,7 +141,7 @@ export class Asset extends ApiResponseHandler {
 
       $('form.form-horizontal[action="/bs/portfolio/edit"]').each((_, form) => {
         const formId = $(form).attr("id")?.replace("new_user_asset_det_", "");
-        const formInputs = $(form).find(".control-group input[id]");
+        const formInputs = $(form).find("input[id]");
         const detail: Partial<AssetModel> = {};
 
         if (formId) {
@@ -155,6 +155,9 @@ export class Asset extends ApiResponseHandler {
           if (id && value) {
             switch (id.replace("user_asset_det_", "")) {
               case "sub_account_id_hash":
+                break;
+              case "id":
+                detail.assetId += `@${value}`
                 break;
               case "temp_asset_subclass_id":
                 break;
@@ -190,7 +193,7 @@ export class Asset extends ApiResponseHandler {
     accountString: string,
     assetId: string
   ): Promise<void> {
-    const url = `/bs/portfolio/${assetId}?sub_account_id_hash=${
+    const url = `/bs/portfolio/${assetId.split("@")[0]}?sub_account_id_hash=${
       accountString.split("@")[1]
     }`;
     const postData = {
@@ -198,4 +201,27 @@ export class Asset extends ApiResponseHandler {
     };
     return this.post(url, postData);
   }
+
+  public async updateAsset(
+    accountString: string,
+    assetId: string,
+    assetSubclassId: AssetSubclass,
+    assetName: string,
+    assetValue: number,
+    assetEntryValue?: number,
+    assetEntryAt?: Date
+  ): Promise<void> {
+    const postData = {
+      _method: "put",
+      "user_asset_det[id]": assetId.split("@")[1],
+      "user_asset_det[sub_account_id_hash]": accountString.split("@")[1],
+      "user_asset_det[asset_subclass_id]": assetSubclassId,
+      "user_asset_det[name]": assetName,
+      "user_asset_det[value]": assetValue,
+      "user_asset_det[entried_price]": assetEntryValue !== undefined ? assetEntryValue : "",
+      "user_asset_det[entried_at]": assetEntryAt ? this.formatDate(assetEntryAt) : "",
+    };
+    return this.post("/bs/portfolio/edit", postData);
+  }
+  
 }

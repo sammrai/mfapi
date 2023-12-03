@@ -75,11 +75,15 @@ async function main() {
   app.get(
     "/accounts/:accountString/assets",
     async (req: Request, res: Response) => {
-      const { accountString } = req.params;
-      const portfolios: AssetModel[] = await assetController.getAssets(
-        accountString
+      try{
+        const { accountString } = req.params;
+        const portfolios: AssetModel[] = await assetController.getAssets(
+          accountString
       );
-      res.status(200).json(portfolios);
+        res.status(200).json(portfolios);
+      }catch (error) {
+        res.status(500).send();
+      }
     }
   );
 
@@ -110,9 +114,36 @@ async function main() {
       try {
         const { accountString, assetId } = req.params;
         await assetController.deleteAsset(accountString, assetId);
-        res.status(200).send();
+        res.status(204).send();
       } catch (error) {
-        res.status(404).send();
+        const err = error as CustomError;
+        if (err.status === 500) {
+          res.status(404).send();
+        } else {
+          res.status(500).send();
+        }
+      }
+    }
+  );
+
+  app.put(
+    "/accounts/:accountString/assets/:assetId",
+    async (req: Request, res: Response) => {
+      try {
+        const { accountString, assetId } = req.params;
+        const { assetSubclassId, name, value } = req.body;
+        const _assetSubclassId =
+          AssetSubclass[assetSubclassId as keyof typeof AssetSubclass];
+        await assetController.updateAsset(
+          accountString,
+          assetId,
+          _assetSubclassId,
+          name,
+          value
+        );
+        res.status(204).send();
+      } catch (error) {
+        res.status(500).send();
       }
     }
   );
