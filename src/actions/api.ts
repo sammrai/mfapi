@@ -44,7 +44,7 @@ export abstract class ApiResponseHandler {
     try {
       const response = await this.axiosInstance.post<U>(url, data);
       // console.log("SUCCESS:", response.data);
-      console.log("post", url, response.status);
+      console.log("post", url, response.status, data);
       // console.log("Response Headers: ", response.headers);
       return response.data;
     } catch (error) {
