@@ -102,37 +102,6 @@ export interface AssetModel {
 }
 
 export class Asset extends ApiResponseHandler {
-  private formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1; // getMonth() は0から始まるため、+1する
-    const day = date.getDate();
-
-    return `${year}/${month}/${day}`;
-  }
-
-  public async addAsset(
-    accountString: string,
-    assetSubclassId: AssetSubclass,
-    assetName: string,
-    assetValue: number,
-    assetEntryValue?: number,
-    assetEntryAt?: Date
-  ) {
-    const postData = {
-      "user_asset_det[id]": "",
-      "user_asset_det[sub_account_id_hash]": accountString.split("@")[1],
-      "user_asset_det[asset_subclass_id]": assetSubclassId,
-      "user_asset_det[name]": assetName,
-      "user_asset_det[value]": assetValue,
-      "user_asset_det[entried_price]":
-        assetEntryValue !== undefined ? assetEntryValue : "",
-      "user_asset_det[entried_at]": assetEntryAt
-        ? this.formatDate(assetEntryAt)
-        : "",
-    };
-    return this.post("/bs/portfolio/new", postData);
-  }
-
   public async getAssets(accountString: string): Promise<AssetModel[]> {
     const url = `/accounts/show_manual/${accountString.split("@")[0]}`;
 
@@ -189,6 +158,28 @@ export class Asset extends ApiResponseHandler {
     });
   }
 
+  public async addAsset(
+    accountString: string,
+    assetSubclassId: AssetSubclass,
+    assetName: string,
+    assetValue: number,
+    assetEntryValue?: number,
+    assetEntryAt?: string
+  ) {
+    const postData = {
+      "user_asset_det[id]": "",
+      "user_asset_det[sub_account_id_hash]": accountString.split("@")[1],
+      "user_asset_det[asset_subclass_id]": assetSubclassId,
+      "user_asset_det[name]": assetName,
+      "user_asset_det[value]": assetValue,
+      "user_asset_det[entried_price]":
+        assetEntryValue !== undefined ? assetEntryValue : "",
+      "user_asset_det[entried_at]":
+        assetEntryAt !== undefined ? assetEntryAt : "",
+    };
+    return this.post("/bs/portfolio/new", postData);
+  }
+
   public async deleteAsset(
     accountString: string,
     assetId: string
@@ -209,7 +200,7 @@ export class Asset extends ApiResponseHandler {
     assetName: string,
     assetValue: number,
     assetEntryValue?: number,
-    assetEntryAt?: Date
+    assetEntryAt?: string
   ): Promise<void> {
     const postData = {
       _method: "put",
@@ -220,9 +211,8 @@ export class Asset extends ApiResponseHandler {
       "user_asset_det[value]": assetValue,
       "user_asset_det[entried_price]":
         assetEntryValue !== undefined ? assetEntryValue : "",
-      "user_asset_det[entried_at]": assetEntryAt
-        ? this.formatDate(assetEntryAt)
-        : "",
+      "user_asset_det[entried_at]":
+        assetEntryAt !== undefined ? assetEntryAt : "",
     };
     return this.post("/bs/portfolio/edit", postData);
   }

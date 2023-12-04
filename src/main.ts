@@ -92,14 +92,17 @@ async function main() {
     async (req: Request, res: Response) => {
       try {
         const { accountString } = req.params;
-        const { assetSubclassId, name, value } = req.body;
+        const { assetSubclassId, name, value, entriedPrice, entriedAt } =
+          req.body;
         const _assetSubclassId =
           AssetSubclass[assetSubclassId as keyof typeof AssetSubclass];
         await assetController.addAsset(
           accountString,
           _assetSubclassId,
           name,
-          value
+          value,
+          entriedPrice,
+          entriedAt
         );
         res.status(201).send();
       } catch (error) {
@@ -131,7 +134,8 @@ async function main() {
     async (req: Request, res: Response) => {
       try {
         const { accountString, assetId } = req.params;
-        const { assetSubclassId, name, value } = req.body;
+        const { assetSubclassId, name, value, entriedPrice, entriedAt } =
+          req.body;
         const _assetSubclassId =
           AssetSubclass[assetSubclassId as keyof typeof AssetSubclass];
         await assetController.updateAsset(
@@ -139,7 +143,9 @@ async function main() {
           assetId,
           _assetSubclassId,
           name,
-          value
+          value,
+          entriedPrice,
+          entriedAt
         );
         res.status(204).send();
       } catch (error) {
